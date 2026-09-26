@@ -174,6 +174,31 @@ Applied to every response (JSON, HTML and errors alike):
 CORS is restricted to `ALLOWED_ORIGINS` with credentials enabled. HSTS is deliberately **not** sent by
 default because the app runs over loopback HTTP; enable it at the TLS terminator (§11).
 
+### The one exception: `/docs` and `/redoc` (development only)
+
+The interactive docs are the only routes that receive a relaxed `Content-Security-Policy`. Swagger UI
+and ReDoc are shipped as CDN bundles, execute an inline initializer and (ReDoc) spawn a worker, so the
+strict `script-src 'self'` above renders a blank page. Those two paths get:
+
+```
+default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; img-src 'self' data: https://fastapi.tiangolo.com https://cdn.redoc.ly; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
+```
+
+Every added origin is the minimum each tool needs: `cdn.jsdelivr.net` (Swagger/ReDoc JS + CSS),
+`fonts.googleapis.com` and `fonts.gstatic.com` (ReDoc webfonts), `fastapi.tiangolo.com` (Swagger
+favicon), `cdn.redoc.ly` (ReDoc logo) and `blob:` (ReDoc search worker). `default-src 'none'`,
+`connect-src 'self'`, `base-uri 'none'`, `form-action 'self'`, `frame-ancestors 'none'` and
+`object-src 'none'` still apply, so the exception cannot reach the API, cookies, `localStorage` or the
+SPA.
+
+The override is applied **per response** in `SecurityHeadersMiddleware`, matching exactly `/docs`,
+`/redoc` and their sub-paths after trailing-slash normalisation. Everything else - `/health`,
+`/openapi.json`, every `/api/*` route, all error responses and the built frontend - keeps the strict
+policy in the table above. Both halves are pinned by
+`backend/tests/security/test_security.py::test_api_docs` (relaxed on the two docs routes, strict on
+`/health`). In production the exception cannot be reached at all: with `ENABLE_DOCS_IN_DEV=false` the
+docs routes are never registered and answer `404` (§11, item 5).
+
 ## 10. Logging, privacy and secrets
 
 * Structured logging (JSON by default) with a redaction filter: `Authorization`, `Cookie`, `Set-Cookie`,
@@ -217,7 +242,7 @@ Run on 2026-09-25 with the pinned toolchain in `requirements-dev.txt`
 | mypy | `mypy` (strict-ish: `disallow_untyped_defs`) | **Success: no issues found in 76 source files** |
 | bandit | `bandit -r backend/app -c pyproject.toml` | 0 high, 7 medium, 2 low — all reviewed below |
 | pip-audit | `pip-audit -r requirements.txt` | **No known vulnerabilities found** |
-| detect-secrets | `detect-secrets scan --all-files --baseline .secrets.baseline` | 16 findings, all reviewed below (baseline committed locally for diffing) |
+| detect-secrets | `detect-secrets scan --all-files --baseline .secrets.baseline` | 17 findings, all reviewed below (`.secrets.baseline` is kept locally for diffing and is git-ignored — `.gitignore` line 46 — so each run is diffed against this machine's baseline) |
 | npm audit | `npm audit` | **0 vulnerabilities** (after upgrading vitest 3.2.7 → 5.0.2) |
 
 **Project-specific checks (in addition to the generic tooling above)**
@@ -254,7 +279,8 @@ modes that matter most here. All three exit 0 on the current tree.
 | `B608` ×7 — "possible SQL injection" | `knowledge/indexing.py`, `knowledge/retrieval.py` | The FTS5 DDL/DML is built from module-level constants (`FTS_TABLE`, `TOKENIZER`); every value is a bound parameter (`:chunk_id`, `:query`, `:limit`). No user data is ever interpolated — verified by reading each statement. Ruff `S608` is suppressed for exactly these two files with the reason recorded in `pyproject.toml`. |
 | `B105` ×2 — "hardcoded password" | `ai/injection_patterns.py:18` (`"secret_extraction"`), `models/audit.py:24` (`"user.password_change"`) | These are category/audit *labels*, not credentials. Suppressed per file with a comment in `pyproject.toml`. |
 | `detect-secrets`: `Hex High Entropy String` ×3 | `security/passwords.py:64-66` | Entries of the weak-password **blocklist** (`abcd12345`, `a1b2c3d4e5`, `abc123456`) — the opposite of a secret. |
-| `detect-secrets`: `Secret Keyword` ×13 | `models/audit.py:24`, `tests/conftest.py`, `tests/integration/test_api_flows.py`, `scripts/{create_admin,smoke_test,dump_response_headers}.py` | Disposable, project-local test/bootstrap credentials and env-var *names* (`ACME_ADMIN_PASSWORD`). None is a real credential; production secrets are supplied via environment variables and are never committed. `.secrets.baseline` records them so any *new* finding fails the diff. |
+| `detect-secrets`: `Secret Keyword` ×13 | `README.md:92`, `models/audit.py:24`, `tests/conftest.py`, `tests/integration/test_api_flows.py`, `scripts/{create_admin,smoke_test,dump_response_headers}.py` | Disposable, project-local test/bootstrap credentials, env-var *names* (`ACME_ADMIN_PASSWORD`) and one documentation example (`$env:ACME_ADMIN_PASSWORD = 'choose-a-strong-passphrase'` in the quick start). None is a real credential; production secrets are supplied via environment variables and are never committed. `.secrets.baseline` records them so any *new* finding fails the diff. |
+| `detect-secrets`: `Base64 High Entropy String` ×1 | `tests/conftest.py:132` | The same disposable `secret_key` literal already listed above, flagged a second time by the base64-entropy plugin; it configures the test app only. |
 
 ## 13. Residual risk and explicitly out-of-scope
 

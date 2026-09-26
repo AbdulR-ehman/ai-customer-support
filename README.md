@@ -175,7 +175,7 @@ deliberately hostile fixture used to prove indirect prompt-injection detection; 
 | --- | --- |
 | `seed_knowledge.py` | Import `knowledge_base/documents/` into the knowledge base (idempotent) |
 | `create_admin.py` | Create/promote an administrator (`ACME_ADMIN_PASSWORD` or interactive prompt) |
-| `smoke_test.py` | End-to-end API smoke test on a throwaway database (36 checks) |
+| `smoke_test.py` | End-to-end API smoke test on a throwaway database (34 checks) |
 | `run_tests.py` | Run the pytest + quality-gate suite and write a report under `logs/` |
 | `make_seed_pdf.py` | Deterministically regenerate the seed PDF |
 | `check_headers.py`, `check_filename_rules.py`, `check_non_ascii.py` | Focused assertions for security headers, upload filename rules and suspicious Unicode |
@@ -189,7 +189,7 @@ Run from the project root with the virtual environment active:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest backend/tests --cov=backend/app --cov-report=term   # 130 passed, 82% coverage
-.\.venv\Scripts\python.exe scripts\smoke_test.py                                         # 36 checks, all passed
+.\.venv\Scripts\python.exe scripts\smoke_test.py                                         # 34 checks, all passed
 .\.venv\Scripts\ruff.exe check backend scripts                                           # All checks passed
 .\.venv\Scripts\ruff.exe format --check backend/app backend/tests scripts                # 81 files already formatted
 .\.venv\Scripts\mypy.exe                                                                 # Success: no issues in 76 files
@@ -198,7 +198,7 @@ Run from the project root with the virtual environment active:
 .\.venv\Scripts\python.exe scripts\check_filename_rules.py                               # hostile upload filenames rejected
 .\.venv\Scripts\bandit.exe -r backend/app -c pyproject.toml -q                           # 0 high, 7 medium/2 low (all audited false positives)
 .\.venv\Scripts\pip-audit.exe -r requirements.txt                                        # no known vulnerabilities
-.\.venv\Scripts\detect-secrets.exe scan --all-files --baseline .secrets.baseline          # 16 known, reviewed findings
+.\.venv\Scripts\detect-secrets.exe scan --all-files --baseline .secrets.baseline          # 17 known, reviewed findings
 
 Set-Location frontend
 npm ci; npm run build; npm test; npm run lint; npm audit                                 # build OK, 2 tests, lint clean, 0 vulnerabilities
@@ -217,7 +217,10 @@ are described in [`docs/SECURITY.md`](docs/SECURITY.md).
 * HttpOnly + SameSite cookies; `Secure` configurable for local HTTP development.
 * CSRF double-submit token (`X-CSRF-Token`) required on every unsafe method.
 * Strict security headers (CSP with `default-src 'none'`, `nosniff`, `DENY` framing, no-referrer,
-  restrictive `Permissions-Policy`); API responses marked `Cache-Control: no-store`.
+  restrictive `Permissions-Policy`); API responses marked `Cache-Control: no-store`. The single
+  exception is path-scoped: `/docs` and `/redoc` (development only) additionally allow the
+  Swagger/ReDoc CDN bundles, Google Fonts, the Swagger/ReDoc images and `blob:` workers so those pages
+  render; every other route keeps the strict policy ([`docs/SECURITY.md`](docs/SECURITY.md) §9).
 * Typed request models, body-size limits, upload magic-byte + extension + size + page-count checks,
   stored filenames replaced by random UUIDs outside the served tree.
 * SQLite-backed rate limiting per user, per IP and per route class, with `Retry-After` on 429.

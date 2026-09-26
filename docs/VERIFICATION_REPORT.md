@@ -67,7 +67,8 @@ rejection, and startup refusal for placeholder `SECRET_KEY` or unsupported `AI_P
 .\.venv\Scripts\python.exe scripts\smoke_test.py      # isolated temp DB + temp upload dir
 ```
 
-**Result: 36 checks PASS, 0 FAIL, final line "All smoke checks passed."** The run covers health,
+**Result: 34 checks PASS, 0 FAIL, final line "All smoke checks passed."** (`scripts/smoke_test.py`
+prints one `[PASS]`/`[FAIL]` line per `check()` execution, and the current script executes 34.) The run covers health,
 security headers, request-id propagation, CSRF enforcement, register/login/logout, session
 invalidation, grounded chat with cited sources, feedback, history, the insufficient-information
 refusal, the prompt-injection refusal, customer blocked from admin endpoints, and the full admin
@@ -145,7 +146,7 @@ integration is genuinely covered.
 | `mypy` | **Success: no issues found in 76 source files** (down from 28 errors at the start of this review) |
 | `bandit -r backend/app -c pyproject.toml` | 0 high · 7 medium (all `B608` FTS5 constant-built SQL) · 2 low (`B105` label strings) · 0 undefined |
 | `pip-audit -r requirements.txt` | **No known vulnerabilities found** |
-| `detect-secrets scan --all-files --baseline .secrets.baseline` | 16 findings, each individually reviewed as a false positive (weak-password blocklist entries, audit/category labels, disposable test credentials, cache tags excluded) |
+| `detect-secrets scan --all-files --baseline .secrets.baseline` | 17 findings, each individually reviewed as a false positive (weak-password blocklist entries, audit/category labels, disposable test credentials, a documentation example of the `ACME_ADMIN_PASSWORD` env-var assignment, cache tags excluded) |
 | `npm audit` | **0 vulnerabilities** |
 
 Three focused project-specific checks supplement the generic tooling above, because none of them

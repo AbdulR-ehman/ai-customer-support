@@ -38,6 +38,24 @@ CONTENT_SECURITY_POLICY = (
     "worker-src 'self'"
 )
 
+#: Relaxed CSP applied exclusively to interactive documentation routes in development.
+#: Swagger UI loads bundle assets from jsdelivr, its favicon from fastapi.tiangolo.com,
+#: and executes an inline initializer script. ReDoc additionally loads Google Fonts,
+#: its logo from cdn.redoc.ly, and spawns a worker from a blob: URL.
+DOCS_CONTENT_SECURITY_POLICY = (
+    "default-src 'none'; "
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+    "img-src 'self' data: https://fastapi.tiangolo.com https://cdn.redoc.ly; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "worker-src 'self' blob:; "
+    "connect-src 'self'; "
+    "base-uri 'none'; "
+    "form-action 'self'; "
+    "frame-ancestors 'none'; "
+    "object-src 'none'"
+)
+
 SECURITY_HEADERS: dict[str, str] = {
     "Content-Security-Policy": CONTENT_SECURITY_POLICY,
     "X-Content-Type-Options": "nosniff",
@@ -69,6 +87,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         if self._enabled:
             for header, value in SECURITY_HEADERS.items():
                 response.headers.setdefault(header, value)
+            path = request.url.path.rstrip("/") or "/"
+            if path in ("/docs", "/redoc") or path.startswith(("/docs/", "/redoc/")):
+                response.headers["Content-Security-Policy"] = DOCS_CONTENT_SECURITY_POLICY
         for header in STRIPPED_HEADERS:
             if header in response.headers:
                 del response.headers[header]

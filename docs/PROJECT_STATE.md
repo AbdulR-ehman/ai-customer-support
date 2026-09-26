@@ -3,7 +3,7 @@
 > Living state file. Updated at the end of every phase and after any major fix.
 > **Never store secrets here.**
 
-_Last updated: Phase 20 — documentation reconciliation + focused-check hardening (2026-09-25)_
+_Last updated: Phase 20 — documentation reconciliation + focused-check hardening (2026-09-25); path-scoped CSP fix for the interactive docs and gate-count re-measurement (2026-09-26)_
 
 ## Current phase
 
@@ -57,18 +57,24 @@ Set-Location 'c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT'
 | Gate | Command | Result (2026-09-25) |
 | --- | --- | --- |
 | Backend tests + coverage | `python -m pytest backend/tests --cov=backend/app --cov-report=term` | **130 passed**, 82% coverage |
-| API smoke test | `python scripts\smoke_test.py` | **36 checks passed**, 0 failed |
+| API smoke test | `python scripts\smoke_test.py` | **34 checks passed**, 0 failed |
 | Lint | `ruff check backend scripts` | **All checks passed** |
 | Format | `ruff format --check backend/app backend/tests scripts` | **81 files already formatted** |
 | Typing | `mypy` | **Success: no issues in 76 files** |
 | SAST | `bandit -r backend/app -c pyproject.toml` | 0 high, 7 medium, 2 low (all audited false positives) |
 | Dependency audit (Python) | `pip-audit -r requirements.txt` | **No known vulnerabilities** |
-| Secret scan | `detect-secrets scan --all-files --baseline .secrets.baseline` | 16 reviewed false positives |
+| Secret scan | `detect-secrets scan --all-files --baseline .secrets.baseline` | 17 reviewed false positives (full disposition list in `docs/SECURITY.md` §12) |
 | Homoglyph / invisible characters | `python scripts\check_non_ascii.py` | **85 files scanned, 0 suspicious lines** (string literals only; allow-lists the 4 modules that describe such characters; `backend/tests` opt-in) |
 | Security-header literals | `python scripts\check_headers.py` | **All 8 headers clean ASCII**, 4 pinned to exact values |
 | Upload filename rules | `python scripts\check_filename_rules.py` | **18 hostile names rejected, 4 legitimate accepted, 0 problems** |
 | Frontend | `npm ci && npm run build && npm test && npm run lint && npm audit` | build OK, 2 tests passed, lint clean, **0 vulnerabilities** |
 | Live browser | Playwright against `uvicorn` + `npm run dev` | customer + admin journeys verified end-to-end |
+
+Re-measured 2026-09-26 with the same toolchain pins: pytest **130 passed / 82%**, `smoke_test.py`
+**34 checks**, ruff · format · mypy · `check_headers.py` · `check_filename_rules.py` ·
+`check_non_ascii.py` unchanged, `detect-secrets` **17 reviewed findings**, and `/docs` + `/redoc` load
+with **0 console errors / 0 warnings** under the path-scoped CSP. `bandit`, `pip-audit` and `npm audit`
+were not re-run on that date.
 
 ## Completed phases
 
@@ -115,7 +121,7 @@ Set-Location 'c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT'
 | Check | Result |
 | --- | --- |
 | `pytest backend/tests --cov=backend/app` | **130 passed** (unit 66 · security 48 · integration 16), **82%** statement coverage |
-| `scripts\smoke_test.py` | **36 checks passed** — health, headers, request id, CSRF, register/login/logout, session invalidation, grounded chat with sources, feedback, history, refusals, admin stats/list/upload/dedup/reindex/disguised-PDF-reject/delete/audit |
+| `scripts\smoke_test.py` | **34 checks passed** — health, headers, request id, CSRF, register/login/logout, session invalidation, grounded chat with sources, feedback, history, refusals, admin stats/list/upload/dedup/reindex/disguised-PDF-reject/delete/audit |
 | Backend import / route table | OK — `app.main:app`, **21 endpoints** across the health/auth/chat/admin routers |
 | Live customer journey | Verified in Chromium: grounded answer with 2 cited sources, both refusal paths, persisted feedback, history restored after reload |
 | Live admin journey | Verified in Chromium: 11 docs/25 chunks → upload → 12/26 → re-index → delete → 11/25, with a complete audit trail |
@@ -145,7 +151,8 @@ Set-Location 'c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT'
 | B-19 | `/favicon.ico` 404 in the browser console | added an inline SVG favicon to `index.html` (no extra request) |
 | B-20 | `ruff format --check` failed on 46 files (formatting drift) | ran `ruff format`; all 81 files now formatted, tests re-run green |
 | B-21 | `scripts/check_headers.py` only compared 4 of the 8 configured headers and only ASCII-screened the CSP, so its "all header values are clean ASCII" message was not backed by the code — `Permissions-Policy`, `Cross-Origin-Opener-Policy` and `Cross-Origin-Resource-Policy` were never inspected | iterate over all of `SECURITY_HEADERS` for non-ASCII, keeping the 4 exact-string assertions |
-| B-22 | `scripts/check_filename_rules.py` did not exercise UNC paths, the Windows device namespace, encoded-dot traversal or an allowlisted-prefix double extension, yet the documentation claimed that coverage | added `\\\\server\share\evil.txt`, `//server/share/evil.txt`, `\\?\C:\evil.txt`, `..%2e%2e/evil.txt`, `invoice.pdf.php`; moved `trailing. .txt` to the accept list (it is *normalised* to `trailing.txt`, not rejected) → 18 rejected / 4 accepted |
+| B-23 | `/docs` and `/redoc` rendered blank: the global strict CSP (`script-src 'self'`) blocked the Swagger UI / ReDoc CDN bundles, the inline initializer, ReDoc's `blob:` worker and the ReDoc logo | added `DOCS_CONTENT_SECURITY_POLICY` and apply it per response only to `/docs`, `/redoc` and their sub-paths (trailing slash normalised); every other route, including `/health` and `/openapi.json`, keeps the strict policy, and both halves are asserted by `test_api_docs` |
+| B-24 | Two gate counts in the docs were stale: the smoke test was quoted as "36 checks" (the script prints one `[PASS]` line per `check()` execution — 32 static call sites, 34 executions) and `detect-secrets` as 16 reviewed findings (the local baseline holds 17: `Base64 High Entropy String` in `tests/conftest.py:132` and `Secret Keyword` in `README.md:92` were not listed) | re-ran both gates on 2026-09-26 and corrected `README.md` (§6·§7), `docs/SECURITY.md` (§12 total plus the two missing dispositions) and `docs/PROJECT_STATE.md` (§gate table and verification status); `docs/VERIFICATION_REPORT.md` §4/§12 updated to match the observable output; the §12 note that called the git-ignored `.secrets.baseline` "committed" now states that it is kept locally (`.gitignore` line 46) |
 
 ## Open issues / known limitations
 

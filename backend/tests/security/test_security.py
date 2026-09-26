@@ -547,6 +547,17 @@ def test_api_docs_are_disabled_outside_development() -> None:
 
     with TestClient(create_app(dev)) as dev_client:
         assert dev_client.get("/openapi.json").status_code == 200
+        docs_resp = dev_client.get("/docs")
+        assert docs_resp.status_code == 200
+        assert "cdn.jsdelivr.net" in docs_resp.headers["content-security-policy"]
+        assert "unsafe-inline" in docs_resp.headers["content-security-policy"]
+        redoc_resp = dev_client.get("/redoc")
+        assert redoc_resp.status_code == 200
+        assert "cdn.jsdelivr.net" in redoc_resp.headers["content-security-policy"]
+        # Ensure strict CSP remains untouched on other endpoints
+        health_resp = dev_client.get("/health")
+        assert "cdn.jsdelivr.net" not in health_resp.headers["content-security-policy"]
+        assert "default-src 'none'" in health_resp.headers["content-security-policy"]
 
     # A production environment refuses to start without a strong secret and
     # Secure cookies, and never exposes the schema.
