@@ -17,7 +17,7 @@ improvements, not blockers (see "Open issues" below).
 | --- | --- |
 | OS | Windows 11 |
 | Shell | PowerShell 5.1 (`powershell.exe`) |
-| Project root | `c:\Users\abdul\OneDrive\Desktop\cline test\AI CUSTOMER SUPPORT` |
+| Project root | `c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT` |
 | Python | 3.14.3 in `./.venv` (project declares `>= 3.11`) |
 | Node.js / npm | v24.19.0 / 11.17.0 — frontend dependencies pinned exactly and locked (`package-lock.json`) |
 | Playwright | MCP browser session (Chromium) used for live verification; no separate browser download |
@@ -51,7 +51,7 @@ All work and server bindings are confined to the project directory and loopback 
 ## Verified commands and current results
 
 ```powershell
-Set-Location 'c:\Users\abdul\OneDrive\Desktop\cline test\AI CUSTOMER SUPPORT'
+Set-Location 'c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT'
 ```
 
 | Gate | Command | Result (2026-09-25) |

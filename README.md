@@ -77,7 +77,7 @@ served: uploads live outside any directory the web server exposes.
 ## 3. Quick start (Windows / PowerShell)
 
 ```powershell
-Set-Location 'c:\Users\abdul\OneDrive\Desktop\cline test\AI CUSTOMER SUPPORT'
+Set-Location 'c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT'
 
 # 1. Environment + dependencies (Python >= 3.11)
 python -m venv .venv

@@ -12,7 +12,7 @@ verified in a real browser against a running server. Known gaps are listed in §
 | Item | Value |
 | --- | --- |
 | OS / shell | Windows 11 · PowerShell 5.1 |
-| Project root | `c:\Users\abdul\OneDrive\Desktop\cline test\AI CUSTOMER SUPPORT` |
+| Project root | `c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT` |
 | Python | 3.14.3 (`./.venv`) — project declares `requires-python >= 3.11` |
 | Node / npm | v24.19.0 / 11.17.0 |
 | Backend deps | `requirements.txt` (fastapi 0.141.1, pydantic 2.13.5, SQLAlchemy 2.0.54, argon2-cffi 25.1.0, pypdf 6.19.0 …) |
@@ -179,7 +179,7 @@ Full disposition tables for every finding are in [`SECURITY.md`](SECURITY.md) §
 ## 10. Reproducing this report
 
 ```powershell
-Set-Location 'c:\Users\abdul\OneDrive\Desktop\cline test\AI CUSTOMER SUPPORT'
+Set-Location 'c:\Users\abdul\OneDrive\Desktop\AI CUSTOMER SUPPORT'
 
 # 1. Backend gates
 .\.venv\Scripts\python.exe -m pytest backend/tests --cov=backend/app --cov-report=term
