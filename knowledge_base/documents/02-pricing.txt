@@ -1,0 +1,47 @@
+Acme Support Pricing and Billing FAQ
+
+HOW DOES ACME SUPPORT BILL?
+
+Acme Support bills monthly in advance by default. Annual billing is available
+and reduces the per-user monthly price. Invoices are issued on the same calendar
+day each month and are payable within 14 days of the invoice date.
+
+WHICH PAYMENT METHODS ARE ACCEPTED?
+
+Acme Support accepts major credit cards, and bank transfer for annual
+contracts. We do not accept cash, cheques, or cryptocurrency.
+
+DO YOU CHARGE TAX?
+
+Prices are shown excluding sales tax. Where applicable, tax is calculated from
+the billing address on your account and added to the invoice. If your billing
+address changes, the new tax rate applies from the next invoice.
+
+CAN I GET A QUOTE BEFORE BUYING?
+
+Yes. Contact Acme Support for a written quote for 20 seats or more, or for an
+annual Acme Vault contract. Quotes are valid for 30 days.
+
+DO YOU OFFER DISCOUNTS?
+
+Acme Support offers a 20 percent discount on annual billing compared with
+monthly billing. We also offer a 10 percent discount for registered
+non-profits and educational organisations. Contact support to apply.
+
+HOW DO I VIEW MY INVOICES?
+
+Signed-in account administrators can download every invoice from the Billing
+page. Invoices are retained for seven years.
+
+WHAT HAPPENS IF A PAYMENT FAILS?
+
+If a payment fails, Acme Support retries the charge up to three times over ten
+days. You receive an email after each failed attempt. If payment still fails
+after the retries, the subscription is paused and your data is retained for 60
+days so you can update your payment method and restore access.
+
+CAN I SWITCH TO ANNUAL BILLING?
+
+Yes. Switching from monthly to annual billing takes effect immediately and
+produces a credit for the unused portion of the current month. Switching from
+annual to monthly billing takes effect at the end of the annual term.

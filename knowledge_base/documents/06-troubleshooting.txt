@@ -1,0 +1,45 @@
+Acme Support Troubleshooting Guide
+
+CONVERSATIONS ARE NOT APPEARING
+
+Clear your browser cache and sign out, then sign in again. If conversations are
+still missing, confirm you are signed in to the correct workspace. A support
+conversation is only visible to members of the workspace that owns it.
+
+EMAIL NOTIFICATIONS ARE NOT ARRIVING
+
+Check the spam folder first. Then confirm your notification preferences on the
+Notifications page. Notification emails are sent from notifications@acmesupport.example.
+Add that address to your allow list. Enterprise mail servers sometimes delay
+delivery by up to 15 minutes.
+
+ATTACHMENT UPLOAD FAILS
+
+Acme Support limits a single attachment to 25 MB. Check the file size. If the
+file is under the limit, try exporting it again: some image and video files
+produced by other tools contain a corrupt header that prevents upload. PDF, PNG,
+JPEG, and plain text files upload reliably.
+
+AUTOMATIONS DO NOT RUN
+
+Automations pause automatically when a plan limit is reached, when a required
+field is empty, or when a destination integration is disconnected. Open the
+automation and review the Run history panel for the exact reason it did not run.
+
+A WORKFLOW RUNS BUT SENDS NOTHING
+
+Check the step conditions. A condition that excludes the record is the most
+common cause. Use Run history to compare the record against the conditions that
+did not match.
+
+ERROR: SESSION EXPIRED
+
+Sessions expire after 120 minutes of inactivity. Sign in again. If your session
+expires repeatedly on a healthy connection, clear cookies for the site and
+disable aggressive browser privacy extensions for this domain.
+
+THE DASHBOARD SHOWS WRONG TOTALS
+
+Totals refresh every 15 minutes. Force a refresh with the reload button. If the
+totals are still incorrect after a manual refresh, the cause is usually a
+filtered view that was left active. Clear all filters and reload.

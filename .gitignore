@@ -1,0 +1,54 @@
+# ---- Secrets & environment ----
+.env
+.env.*
+!.env.example
+
+# ---- Python ----
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# ---- Node / frontend ----
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# ---- Databases & runtime data ----
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+logs/
+uploads/
+storage/
+knowledge_base/extracted/
+
+# ---- Testing / reports ----
+playwright-report/
+test-results/
+e2e/artifacts/
+*.trace.zip
+screenshots/
+
+# ---- Secrets scanners ----
+.secrets.baseline
+
+# ---- Editors / OS ----
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

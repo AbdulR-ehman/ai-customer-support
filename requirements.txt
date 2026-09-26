@@ -1,0 +1,15 @@
+# ---------------------------------------------------------------------------
+# Acme Support AI - runtime dependencies (pinned, Python >= 3.11)
+#
+# Zero-cost / offline: no paid AI SDK is present, and none is required.
+# Install with:  python -m pip install -r requirements.txt
+# ---------------------------------------------------------------------------
+fastapi==0.141.1
+uvicorn==0.53.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+SQLAlchemy==2.0.54
+alembic==1.20.0
+argon2-cffi==25.1.0
+pypdf==6.19.0
+python-multipart==0.0.32
