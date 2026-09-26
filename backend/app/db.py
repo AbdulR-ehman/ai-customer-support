@@ -12,7 +12,7 @@ from collections.abc import Generator, Iterator
 from contextlib import contextmanager
 from typing import Any
 
-from sqlalchemy import Engine, create_engine, event, text
+from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import Settings
@@ -121,27 +121,3 @@ def session_scope() -> Iterator[Session]:
         raise
     finally:
         session.close()
-
-
-def check_database() -> bool:
-    """Return True when the database answers a trivial query."""
-    try:
-        with get_engine().connect() as connection:
-            connection.execute(text("SELECT 1"))
-        return True
-    except Exception:  # pragma: no cover - environmental failure
-        logger.exception("database health check failed")
-        return False
-
-
-def sqlite_supports_fts5() -> bool:
-    """Verify FTS5 availability at startup (retrieval depends on it)."""
-    try:
-        with get_engine().connect() as connection:
-            connection.execute(text("CREATE VIRTUAL TABLE IF NOT EXISTS _fts5_probe USING fts5(x)"))
-            connection.execute(text("DROP TABLE IF EXISTS _fts5_probe"))
-            connection.commit()
-        return True
-    except Exception:  # pragma: no cover - sqlite built without FTS5
-        logger.exception("SQLite build has no FTS5 support")
-        return False

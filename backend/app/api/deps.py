@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.db import get_db
-from app.errors import AuthenticationError, NotFoundError, PermissionDeniedError
+from app.errors import AuthenticationError, PermissionDeniedError
 from app.models.user import ROLE_ADMIN, SessionToken, User
 from app.security.csrf import (
     build_csrf_token,
@@ -140,13 +140,6 @@ def get_request_meta(request: Request, settings: SettingsDep) -> tuple[str | Non
 RequestMetaDep = Annotated[tuple[str | None, str | None], Depends(get_request_meta)]
 
 
-def require_found(resource: object | None) -> object:
-    """Raise a non-leaking 404 when an owner-scoped lookup misses."""
-    if resource is None:
-        raise NotFoundError()
-    return resource
-
-
 __all__ = [
     "CurrentAdmin",
     "CurrentUser",
@@ -161,6 +154,5 @@ __all__ = [
     "get_request_meta",
     "issue_preauth_csrf",
     "require_admin",
-    "require_found",
     "require_user",
 ]
