@@ -1,0 +1,43 @@
+# Acme Support — Service Plans Comparison
+
+This document compares the three Acme Support plans feature by feature.
+
+## INCLUDED FEATURES
+
+Shared inbox: included on Acme Desk, Acme Flow, and Acme Vault.
+Saved replies: included on Acme Desk, Acme Flow, and Acme Vault.
+Automated triage: included on Acme Desk, Acme Flow, and Acme Vault.
+Workflow automation: not included on Acme Desk. Included on Acme Flow and
+Acme Vault.
+Webhook integrations: not included on Acme Desk. Included on Acme Flow and
+Acme Vault.
+Attachment storage: 5 GB on Acme Desk, 100 GB on Acme Flow, and 1 TB on
+Acme Vault.
+Single sign-on: only included on Acme Vault.
+Data residency choice: only included on Acme Vault.
+Audit log export: included on Acme Flow and Acme Vault.
+Priority support: only included on Acme Vault.
+
+## SUPPORT RESPONSE TARGETS
+
+Acme Desk: one business day.
+Acme Flow: one business day.
+Acme Vault: 4 hours during business hours, 24 hours outside business hours.
+
+## PRICE COMPARISON
+
+Acme Desk is $12 per user per month monthly, or $10 annually.
+Acme Flow is $29 per user per month monthly, or $24 annually.
+Acme Vault is $49 per user per month monthly, or $45 annually.
+Annual billing on Acme Vault is required.
+
+## WHICH PLAN SHOULD I CHOOSE?
+
+Choose Acme Desk if you need a shared inbox and triage only. Choose Acme Flow if
+you need automation and integrations. Choose Acme Vault if you need single
+sign-on, data residency, or priority support.
+
+## CAN I MIX PLANS?
+
+No. Every member of a workspace must be on the same plan. Split distinct teams
+into separate workspaces if they need different plans.

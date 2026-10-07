@@ -1,0 +1,113 @@
+[project]
+name = "acme-support-ai"
+version = "0.1.0"
+description = "Acme Support AI - zero-cost AI customer support system (mock AI provider, offline retrieval)"
+requires-python = ">=3.11"
+
+# ---------------------------------------------------------------------------
+# Ruff - lint + format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [".venv", "venv", "node_modules", "frontend/dist", "storage", "logs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "C4", "UP", "S", "SIM", "RUF", "T20", "PTH"]
+ignore = [
+    "E501",   # line length handled by the formatter
+    "B008",   # FastAPI Depends() in defaults is idiomatic
+    "S101",   # assert used in tests (narrowed by per-file-ignores below)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests deliberately contain hostile input (homoglyphs, oversized payloads,
+# 0.0.0.0 host values) and assert that invalid configuration refuses to load.
+"backend/tests/**" = [
+    "S101",   # assert is the whole point of a test
+    "S104",   # 0.0.0.0 only ever appears as a value that must be rejected
+    "S105", "S106", "S107",  # dummy credentials created by fixtures
+    "S311",   # determinism matters more than cryptographic randomness here
+    "T20", "E402",
+    "B017",   # blind raises assertions prove that invalid config refuses to load
+    "RUF001", "RUF002", "RUF003",  # the ambiguous unicode *is* the payload
+]
+# Operator tooling: environment-variable names, disposable test secrets, and the
+# homoglyph/encoding audit scripts that exist precisely to handle non-ASCII text.
+"scripts/**" = ["T20", "S101", "PTH", "S105", "S106", "RUF001", "RUF002", "RUF003"]
+# SQL is assembled only from module-level constants in the FTS5 layer; no user
+# value is ever interpolated (every value is a bound parameter).
+"backend/app/knowledge/indexing.py" = ["S608"]
+"backend/app/knowledge/retrieval.py" = ["S608"]
+# The guard keeps a reviewable table of homoglyph/translated attack text.
+"backend/app/ai/injection_patterns.py" = ["RUF001", "S105"]
+# Audit-action names such as "user.password_change" are labels, not credentials.
+"backend/app/models/audit.py" = ["S105"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ---------------------------------------------------------------------------
+# mypy - static typing on the core modules
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+files = ["backend/app", "scripts"]
+exclude = ["^frontend/", "^backend/alembic/versions/"]
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+show_error_codes = true
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["backend/tests"]
+pythonpath = ["backend"]
+addopts = "-ra --strict-markers --strict-config"
+markers = [
+    "unit: fast, isolated unit test",
+    "integration: exercises the API/database end to end",
+    "security: security control verification",
+    "slow: slower than usual",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:starlette.*",
+    "ignore::DeprecationWarning:httpx.*",
+]
+
+# ---------------------------------------------------------------------------
+# coverage
+# ---------------------------------------------------------------------------
+[tool.coverage.run]
+branch = true
+source = ["backend/app"]
+omit = ["backend/app/main.py", "*/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    '^\s*\.\.\.$',
+]
+
+# ---------------------------------------------------------------------------
+# bandit
+# ---------------------------------------------------------------------------
+[tool.bandit]
+exclude_dirs = ["backend/tests", ".venv", "frontend", "node_modules"]

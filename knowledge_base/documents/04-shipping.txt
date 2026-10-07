@@ -1,0 +1,37 @@
+Acme Support Shipping and Delivery
+
+All Acme Support products are online services. There is no physical product and
+no physical shipment. Access is granted to your account immediately after a
+successful payment.
+
+ONBOARDING AND ACCESS
+
+When you start a new subscription, your administrator receives an email with
+a sign-in link. Access is usually available within 5 minutes of payment. The
+activation email is sent only to the address that completed the purchase.
+
+SERVICE AVAILABILITY
+
+Acme Support targets 99.9 percent monthly availability for Acme Desk and Acme
+Flow, and 99.99 percent for Acme Vault. Maintenance windows are announced at
+least 48 hours in advance and are scheduled outside business hours.
+
+DATA REGION
+
+Acme Support stores customer data in the United States by default. Customers on
+Acme Vault may select the European Union or Australia as their data region
+before onboarding. The data region cannot be changed after the first production
+workspace is created.
+
+CHANGING DATA REGION
+
+To move your workspace to another region, contact Acme Support. A regional
+migration takes approximately 10 business days and requires a short service
+pause. Only Acme Vault customers can change region.
+
+DOWNLOADING YOUR DATA
+
+Account administrators can export workspace data as JSON or CSV files from the
+Export page. Exports are available for 7 days. Exports contain support
+conversations, account settings, and audit records. Exported files are not
+password protected by Acme Support, so store them securely.
